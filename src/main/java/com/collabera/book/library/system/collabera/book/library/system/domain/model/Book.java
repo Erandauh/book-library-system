@@ -48,12 +48,4 @@ public class Book {
   @OneToMany(mappedBy = "book")
   private List<BorrowRecord> borrowRecords = new ArrayList<>();
 
-  public BookResponse toDto() {
-    return BookResponse.builder()
-        .bookId(this.id)
-        .title(this.title)
-        .author(this.author)
-        .isbn(this.isbn)
-        .build();
-  }
 }

@@ -13,6 +13,6 @@ public class BorrowerServiceImpl implements BorrowerService {
 
   @Override
   public Borrower registerBorrower(Borrower borrower) {
-    return null;
+    return borrowerRepository.save(borrower);
   }
 }

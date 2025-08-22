@@ -10,12 +10,14 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "BORROW_RECORD")
@@ -37,6 +39,12 @@ public class BorrowRecord {
   @ManyToOne
   @JoinColumn(name = "BORROWER_ID")
   private Borrower borrower;
+
+  @Column(name = "BORROW_MSG")
+  private String borrowMsg;
+
+  @Column(name = "ACTIVE" , nullable = false)
+  private boolean active; // true if book is currently borrowed
 
   @Column(name = "BORROWED_AT")
   private LocalDateTime borrowedAt;

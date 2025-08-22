@@ -3,7 +3,6 @@ package com.collabera.book.library.system.collabera.book.library.system.api.v1;
 import com.collabera.book.library.system.collabera.book.library.system.api.ro.request.BookRequest;
 import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BookResponse;
 import com.collabera.book.library.system.collabera.book.library.system.application.BookService;
-import com.collabera.book.library.system.collabera.book.library.system.domain.model.Book;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +30,14 @@ public class BookController {
     var bookSaved = bookService.registerBook(book);
 
     // maps Entity back to DTO -> passes back as HTTP response
-    return ResponseEntity.ok(bookSaved.toDto());
+    return ResponseEntity.ok(BookResponse.of(bookSaved));
   }
 
   @GetMapping("/library/book")
   public ResponseEntity<List<BookResponse>> listBooks() {
 
     return ResponseEntity.ok(bookService.getAllBooks().stream()
-        .map(Book::toDto)
+        .map(BookResponse::of)
         .toList());
   }
 }
