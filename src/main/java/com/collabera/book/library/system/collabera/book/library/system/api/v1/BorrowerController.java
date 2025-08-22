@@ -1,11 +1,15 @@
 package com.collabera.book.library.system.collabera.book.library.system.api.v1;
 
 import com.collabera.book.library.system.collabera.book.library.system.api.ro.request.BorrowerRequest;
+import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BookResponse;
+import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BorrowResponse;
 import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BorrowerResponse;
 import com.collabera.book.library.system.collabera.book.library.system.application.BorrowerService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,4 +36,11 @@ public class BorrowerController {
     return ResponseEntity.ok(BorrowerResponse.of(borrowerSaved));
   }
 
+  @GetMapping("/library/borrower")
+  public ResponseEntity<List<BorrowerResponse>> listBooks() {
+
+    return ResponseEntity.ok(borrowerService.getAllBorrowers().stream()
+        .map(BorrowerResponse::of)
+        .toList());
+  }
 }

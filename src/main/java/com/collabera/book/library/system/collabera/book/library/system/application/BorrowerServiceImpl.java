@@ -2,6 +2,7 @@ package com.collabera.book.library.system.collabera.book.library.system.applicat
 
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Borrower;
 import com.collabera.book.library.system.collabera.book.library.system.domain.repositories.BorrowerRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,5 +15,10 @@ public class BorrowerServiceImpl implements BorrowerService {
   @Override
   public Borrower registerBorrower(Borrower borrower) {
     return borrowerRepository.save(borrower);
+  }
+
+  @Override
+  public List<Borrower> getAllBorrowers() {
+    return borrowerRepository.findAll();
   }
 }

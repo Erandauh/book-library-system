@@ -14,4 +14,4 @@ VALUES ('87646857-479b-4480-bb14-e2aabc490846', '9781617294945', 'Spring in Acti
 
 -- Another copy of the same book (multiple copies allowed)
 INSERT INTO book (book_id, isbn, title, author, borrowed)
-VALUES ('4d55c5a1-eedc-403c-961e-a822b0bb9334', '9781617294945', 'Spring in Action', 'Craig Walls', false);
+VALUES ('4d55c5a1-eedc-403c-961e-a822b0bb9334', '9781617294945', 'Refactor Java Code', 'Martin Fowler', false);

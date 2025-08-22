@@ -1,5 +1,6 @@
 package com.collabera.book.library.system.collabera.book.library.system.application;
 
+import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BorrowRecordResponse;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Book;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.BorrowRecord;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Borrower;
@@ -8,7 +9,9 @@ import com.collabera.book.library.system.collabera.book.library.system.domain.re
 import com.collabera.book.library.system.collabera.book.library.system.domain.repositories.BorrowerRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +25,8 @@ public class BorrowServiceImpl implements BorrowService {
 
   @Override
   @Transactional
-  public BorrowRecord  borrowBook(UUID borrowerId, UUID bookId, String message) {
-  // check if book already borrowed
+  public BorrowRecord borrowBook(UUID borrowerId, UUID bookId, String message) {
+    // check if book already borrowed
     if (borrowRecordRepository.existsByBookIdAndActiveTrue(bookId)) {
       throw new IllegalStateException("Book is already borrowed");
     }
@@ -58,5 +61,9 @@ public class BorrowServiceImpl implements BorrowService {
     borrowRecord.setReturnedAt(LocalDateTime.now());
 
     return borrowRecordRepository.save(borrowRecord);
+  }
+
+  public List<BorrowRecord> getCurrentBorrowRecords() {
+    return borrowRecordRepository.findByActiveIsTrue();
   }
 }
