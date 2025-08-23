@@ -1,6 +1,8 @@
 package com.collabera.book.library.system.collabera.book.library.system.application;
 
-import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BorrowRecordResponse;
+import com.collabera.book.library.system.collabera.book.library.system.application.exceptions.BorrowBookFailedException;
+import com.collabera.book.library.system.collabera.book.library.system.application.exceptions.ReturnBookFailedException;
+import com.collabera.book.library.system.collabera.book.library.system.domain.exceptions.BorrowStateException;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Book;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.BorrowRecord;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Borrower;
@@ -8,10 +10,8 @@ import com.collabera.book.library.system.collabera.book.library.system.domain.re
 import com.collabera.book.library.system.collabera.book.library.system.domain.repositories.BorrowRecordRepository;
 import com.collabera.book.library.system.collabera.book.library.system.domain.repositories.BorrowerRepository;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,22 +28,16 @@ public class BorrowServiceImpl implements BorrowService {
   public BorrowRecord borrowBook(UUID borrowerId, UUID bookId, String message) {
     // check if book already borrowed
     if (borrowRecordRepository.existsByBookIdAndActiveTrue(bookId)) {
-      throw new IllegalStateException("Book is already borrowed");
+      throw new BorrowBookFailedException("Book is already borrowed");
     }
 
     Book book = bookRepository.findById(bookId)
-        .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+        .orElseThrow(() -> new BorrowBookFailedException("Book not found"));
 
     Borrower borrower = borrowerRepository.findById(borrowerId)
-        .orElseThrow(() -> new IllegalArgumentException("Borrower not found"));
+        .orElseThrow(() -> new BorrowBookFailedException("Borrower not found"));
 
-    BorrowRecord borrowRecord = BorrowRecord.builder()
-        .book(book)
-        .borrower(borrower)
-        .borrowMsg(message)
-        .borrowedAt(LocalDateTime.now())
-        .active(true)
-        .build();
+    BorrowRecord borrowRecord = BorrowRecord.createBorrow(book, borrower, message);
 
     return borrowRecordRepository.save(borrowRecord);
   }
@@ -51,14 +45,14 @@ public class BorrowServiceImpl implements BorrowService {
   @Transactional
   public BorrowRecord returnBook(UUID borrowRecordId) {
     BorrowRecord borrowRecord = borrowRecordRepository.findById(borrowRecordId)
-        .orElseThrow(() -> new IllegalArgumentException("Borrow record not found"));
+        .orElseThrow(() -> new ReturnBookFailedException("Borrow record not found"));
 
-    if (!borrowRecord.isActive()) {
-      throw new IllegalStateException("Book already returned");
+    try {
+      BorrowRecord.createReturn(borrowRecord);
+    } catch (BorrowStateException e) {
+      // application layer exception wraps the domain exception
+      throw new ReturnBookFailedException("Failed to return book", e);
     }
-
-    borrowRecord.setActive(false);
-    borrowRecord.setReturnedAt(LocalDateTime.now());
 
     return borrowRecordRepository.save(borrowRecord);
   }

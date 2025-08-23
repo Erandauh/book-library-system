@@ -1,6 +1,6 @@
 package com.collabera.book.library.system.collabera.book.library.system.domain.model;
 
-import com.collabera.book.library.system.collabera.book.library.system.api.ro.response.BookResponse;
+import com.collabera.book.library.system.collabera.book.library.system.domain.exceptions.BookStateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,10 +42,20 @@ public class Book {
   @Column(name = "AUTHOR")
   private String author;
 
-  @Column(name = "BORROWED")
-  private boolean borrowed;
-
   @OneToMany(mappedBy = "book")
   private List<BorrowRecord> borrowRecords = new ArrayList<>();
 
+  /*
+   * Validate same isbn exsistance
+   */
+  public void validateConsistencyWith(Book other) throws BookStateException {
+    // same ISBN => must have same title and author
+    if (!this.getTitle().equals(other.getTitle()) ||
+        !this.getAuthor().equals(other.getAuthor())) {
+      throw new BookStateException(
+          String.format(
+              "Invalid book registration: ISBN %s already exists with different title/author.",
+              other.getIsbn()));
+    }
+  }
 }

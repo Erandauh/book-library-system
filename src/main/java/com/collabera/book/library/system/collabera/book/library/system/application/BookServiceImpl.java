@@ -1,5 +1,7 @@
 package com.collabera.book.library.system.collabera.book.library.system.application;
 
+import com.collabera.book.library.system.collabera.book.library.system.application.exceptions.BookRegistrationFailureException;
+import com.collabera.book.library.system.collabera.book.library.system.domain.exceptions.BookStateException;
 import com.collabera.book.library.system.collabera.book.library.system.domain.model.Book;
 import com.collabera.book.library.system.collabera.book.library.system.domain.repositories.BookRepository;
 import java.util.List;
@@ -15,24 +17,18 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public Book registerBook(Book book) {
-    // Check if ISBN already exists
+    // Orchestration of the book registration
     Optional<Book> existingBookOpt = bookRepository.findFirstByIsbn(book.getIsbn());
 
     if (existingBookOpt.isPresent()) {
       Book existingBook = existingBookOpt.get();
-
-      // same ISBN => must have same title and author
-      if (!existingBook.getTitle().equals(book.getTitle()) ||
-          !existingBook.getAuthor().equals(book.getAuthor())) {
-        throw new IllegalArgumentException(
-            String.format(
-                "Invalid book registration: ISBN %s already exists with different title/author.",
-                book.getIsbn()));
+      try {
+        existingBook.validateConsistencyWith(book);
+      } catch (
+          BookStateException e) {
+        throw new BookRegistrationFailureException("Failed to register book", e);
       }
     }
-
-    // Always save new copy (new UUID)
-    book.setBorrowed(false);
 
     return bookRepository.save(book);
   }

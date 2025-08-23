@@ -1,5 +1,6 @@
 package com.collabera.book.library.system.collabera.book.library.system.domain.model;
 
+import com.collabera.book.library.system.collabera.book.library.system.domain.exceptions.BorrowStateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,7 +44,7 @@ public class BorrowRecord {
   @Column(name = "BORROW_MSG")
   private String borrowMsg;
 
-  @Column(name = "ACTIVE" , nullable = false)
+  @Column(name = "ACTIVE", nullable = false)
   private boolean active; // true if book is currently borrowed
 
   @Column(name = "BORROWED_AT")
@@ -51,4 +52,26 @@ public class BorrowRecord {
 
   @Column(name = "RETURNED_AT")
   private LocalDateTime returnedAt;
+
+  public static BorrowRecord createBorrow(Book book, Borrower borrower, String message) {
+    return BorrowRecord.builder()
+        .book(book)
+        .borrower(borrower)
+        .borrowMsg(message)
+        .borrowedAt(LocalDateTime.now())
+        .active(true)
+        .build();
+  }
+
+  public static void createReturn(BorrowRecord returnRecord) throws BorrowStateException {
+
+    if (!returnRecord.isActive()) {
+      throw new BorrowStateException("Book already returned");
+    }
+
+    returnRecord.setActive(false);
+    returnRecord.setReturnedAt(LocalDateTime.now());
+    returnRecord.setBorrowMsg(
+        returnRecord.getBorrowMsg() == null ? "Returned" : returnRecord.getBorrowMsg());
+  }
 }
