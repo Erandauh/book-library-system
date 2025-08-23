@@ -2,9 +2,11 @@ package com.collabera.book.library.system.api.ro.request;
 
 import com.collabera.book.library.system.domain.model.Book;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class BookRequest {
 
   @NotBlank

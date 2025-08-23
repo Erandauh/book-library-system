@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.collabera.book.library.system'
@@ -35,6 +36,20 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+jacoco {
+	toolVersion = "0.8.10" // or latest
+}
+
+jacocoTestReport {
+	dependsOn test // tests are required before generating the report
+
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+		csv.required.set(false)
+	}
 }
 
 tasks.named('test') {
